@@ -12,8 +12,10 @@ import {
   Divider,
   TextField,
   Unstable_Grid2 as Grid,
-  Input,
-  OutlinedInput
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  FilledInput
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -25,7 +27,7 @@ const memorandoMaskCustom = React.forwardRef(function memorandoMaskCustom(props,
   return (
     <IMaskInput
       {...other}
-      mask="00.0000.0/00"
+      mask="##.####.#/##"
       definitions={{
         '#': /[1-5]/,
       }}
@@ -88,7 +90,7 @@ export const AccountProfileDetails = () => {
       unidadeDescentralizadora: Yup.string().required("É obrigatório preencher uma Unidade descentralizadora"),
       dotacao: Yup.string().required("É obrigatório preencher um objeto"),
       modalidade: Yup.string().required("É obrigatório preencher um objeto"),
-      memorando: Yup.string().required("É obrigatório preencher um memorando")
+      memorando: Yup.string().required("É obrigatório preencher um memorando").min(12, 'min 12')
      
 
     }),
@@ -289,9 +291,9 @@ export const AccountProfileDetails = () => {
                 xs={12}
                 md={6}
               >
-                <OutlinedInput
-                  fullWidth
-                  label="Memorando"
+                <FormControl variant="filled">
+                <InputLabel htmlFor="component-filled">Memorando *</InputLabel>
+                <FilledInput          
                   name="memorando"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -302,6 +304,7 @@ export const AccountProfileDetails = () => {
                 <Typography color='error' variant="caption"> 
                 {formik.touched.memorando && formik.errors.memorando}
                 </Typography>
+                </FormControl>
               </Grid>
               <Grid
                 xs={12}
