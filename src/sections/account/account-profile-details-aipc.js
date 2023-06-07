@@ -1,4 +1,6 @@
-import { useCallback, useState } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import {
   Typography,
   Box,
@@ -9,10 +11,36 @@ import {
   CardHeader,
   Divider,
   TextField,
-  Unstable_Grid2 as Grid
+  Unstable_Grid2 as Grid,
+  Input,
+  OutlinedInput
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { IMaskInput } from 'react-imask';
+import { red } from '@mui/material/colors';
+
+const memorandoMaskCustom = React.forwardRef(function memorandoMaskCustom(props, ref) {
+  const { onChange, ...other } = props;
+  return (
+    <IMaskInput
+      {...other}
+      mask="00.0000.0/00"
+      definitions={{
+        '#': /[1-5]/,
+      }}
+      inputRef={ref}
+      onAccept={(value) => onChange({ target: { name: props.name, value } })}
+      overwrite
+    />
+  );
+});
+
+memorandoMaskCustom.propTypes = {
+  name: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
 
 // const states = [
 //   {
@@ -46,20 +74,21 @@ export const AccountProfileDetails = () => {
       modalidade: 'modalidade',
       processo: '001/2023',
       despacho: '055/2022',
-      memorando: '4052.2/2022-2',
+      memorando: '',
       msgPA: '202209058127032-2209',
       nrSei: '1250.01.0011145/2024-31',
       origem: 'orgão',
       preposto: 'fulano'
     },
     validationSchema: Yup.object({
-      unidadeBeneficiada: Yup.string().min(7).required("É obrigatório preencher uma Unidade beneficiada"),
+      unidadeBeneficiada: Yup.string().required("É obrigatório preencher uma Unidade"),
       objeto: Yup.string().required("É obrigatório preencher um objeto"),
       ValorTotal: Yup.string().required("É obrigatório preencher um objeto"),
       unidadeCompra: Yup.string().required("É obrigatório preencher um objeto"),
       unidadeDescentralizadora: Yup.string().required("É obrigatório preencher uma Unidade descentralizadora"),
       dotacao: Yup.string().required("É obrigatório preencher um objeto"),
-      modalidade: Yup.string().required("É obrigatório preencher um objeto")
+      modalidade: Yup.string().required("É obrigatório preencher um objeto"),
+      memorando: Yup.string().required("É obrigatório preencher um memorando")
      
 
     }),
@@ -67,7 +96,6 @@ export const AccountProfileDetails = () => {
       console.log(values)
     }
   })
-
 
   return (
     <form
@@ -102,9 +130,7 @@ export const AccountProfileDetails = () => {
                   helperText={formik.touched.unidadeBeneficiada && formik.errors.unidadeBeneficiada}
                   error={!!(formik.touched.unidadeBeneficiada && formik.errors.unidadeBeneficiada)}
                   required
-                  value={formik.values.unidadeBeneficiada}
-
-
+                  value={formik.values.unidadeBeneficiada}            
                 />
               </Grid>
               <Grid
@@ -263,17 +289,19 @@ export const AccountProfileDetails = () => {
                 xs={12}
                 md={6}
               >
-                <TextField
+                <OutlinedInput
                   fullWidth
                   label="Memorando"
                   name="memorando"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  helperText={formik.errors.memorando}
-                  error={!!formik.errors.memorando}
-                  required
+                  error={!!(formik.touched.memorando && formik.errors.memorando)}
                   value={formik.values.memorando}
+                  inputComponent={memorandoMaskCustom}
                 />
+                <Typography color='error' variant="caption"> 
+                {formik.touched.memorando && formik.errors.memorando}
+                </Typography>
               </Grid>
               <Grid
                 xs={12}
